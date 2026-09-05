@@ -1,0 +1,12 @@
+CI_ENVIRONMENT = development
+app.baseURL = 'http://localhost:8080/'
+app.forceGlobalSecureRequests = false
+
+# sandbox | production
+satusehat.environment = sandbox
+satusehat.organization_id =
+satusehat.client_id =
+satusehat.client_secret =
+# Optional override. Leave blank to use official endpoint for selected environment.
+satusehat.oauth_base =
+satusehat.fhir_base =

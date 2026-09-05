@@ -1,0 +1,13 @@
+/vendor/
+.env
+.phpunit.result.cache
+/writable/cache/*
+/writable/logs/*
+/writable/session/*
+/writable/debugbar/*
+/writable/uploads/*
+/writable/satusehat/*.jsonl
+!/writable/**/.gitkeep
+.idea/
+.vscode/
+.DS_Store
