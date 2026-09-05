@@ -7,6 +7,9 @@
 /writable/debugbar/*
 /writable/uploads/*
 /writable/satusehat/*.jsonl
+/writable/terminology/*.jsonl
+/writable/terminology/*.json
+/writable/terminology/*.csv
 !/writable/**/.gitkeep
 .idea/
 .vscode/
