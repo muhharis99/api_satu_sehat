@@ -74,7 +74,7 @@ class Terminology extends BaseController
                     $items[] = $item;
                 }
             } else {
-                $rows = $body['items']['data'] ?? $body['data'] ?? [];
+                $rows = $body['items']['data'] ?? $body['meta']['data'] ?? $body['data'] ?? [];
                 if (is_array($rows)) {
                     foreach ($rows as $row) {
                         if (! is_array($row)) {
@@ -94,7 +94,7 @@ class Terminology extends BaseController
             'ok' => (bool) ($result['ok'] ?? false),
             'type' => 'kfa',
             'query' => $query,
-            'source' => 'satusehat-kfa-v2',
+            'source' => $productType === 'alkes' ? 'satusehat-kfa-v3-alkes' : 'satusehat-kfa-v2',
             'system' => [
                 'label' => 'KFA',
                 'system' => 'http://sys-ids.kemkes.go.id/kfa',
