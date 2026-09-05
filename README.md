@@ -11,7 +11,8 @@ Simulator / FHIR explorer SATUSEHAT berbasis **CodeIgniter 4**. Project dibuat u
 - Preset Patient, Practitioner, Organization, Location, Encounter, Condition, Observation, Procedure, ServiceRequest, Specimen, DiagnosticReport, MedicationRequest, MedicationDispense, Composition, Bundle
 - JSON request editor dan response viewer
 - Browser Kode Medis: ICD-10 2010, SNOMED CT, LOINC, KFA, dan KPTL
-- KFA terhubung ke endpoint KFA v2 resmi SATUSEHAT
+- KFA Farmasi terhubung ke endpoint KFA v2 resmi SATUSEHAT
+- KFA Alat Kesehatan terhubung ke endpoint KFA v3 resmi SATUSEHAT
 - Hasil terminologi dapat langsung dimasukkan ke JSON FHIR aktif
 - Riwayat request lokal tanpa menyimpan token/payload pasien
 - Credential dari `.env` atau input sementara di browser
@@ -71,7 +72,7 @@ Menu **Kode Medis** menyediakan pencarian:
 
 ### KFA
 
-KFA tidak memakai data dummy. Pencarian diarahkan ke KFA v2 SATUSEHAT menggunakan Bearer access token aktif.
+KFA tidak memakai data dummy. Farmasi/obat diarahkan ke KFA v2 SATUSEHAT dan alat kesehatan diarahkan ke KFA v3 SATUSEHAT. Keduanya menggunakan Bearer access token SATUSEHAT aktif.
 
 ### ICD-10, SNOMED CT, LOINC, KPTL
 
@@ -107,19 +108,48 @@ J40,"Bronchitis, not specified as acute or chronic"
 
 Beberapa nama kolom umum seperti `kode`, `description`, `deskripsi`, `concept_id`, `LoincNumber`, dan `LongCommonName` juga dikenali.
 
-Dataset di `writable/terminology` di-ignore oleh Git agar data berlisensi atau file besar tidak tidak sengaja dipublikasikan.
+### Memakai file KPTL v1.7 yang sudah pernah dibuat
+
+File JSON hasil konversi `KODE PEMBIAYAAN TINDAKAN & LAYANAN KESEHATAN v1.7.xlsx` dapat langsung dipakai. Rename menjadi:
+
+```text
+kptl.json
+```
+
+lalu salin ke:
+
+```text
+writable/terminology/kptl.json
+```
+
+Parser sudah mendukung field:
+
+```text
+Status
+Nama Tindakan dan Layanan
+Base Code
+Allowed Modifiers
+Kode KPTL
+Display
+Code System
+Version
+```
+
+Dataset di `writable/terminology` di-ignore oleh Git agar data berlisensi atau file besar tidak sengaja dipublikasikan.
 
 ## Endpoint resmi
 
 Sandbox:
 - OAuth: `https://api-satusehat-stg.dto.kemkes.go.id/oauth2/v1`
 - FHIR R4: `https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1`
-- KFA v2: `https://api-satusehat-stg.dto.kemkes.go.id/kfa-v2`
+- KFA Farmasi v2: `https://api-satusehat-stg.dto.kemkes.go.id/kfa-v2`
+- KFA Alat Kesehatan v3: `https://api-satusehat-stg.dto.kemkes.go.id/kfa-v3`
 
 Production:
 - OAuth: `https://api-satusehat.kemkes.go.id/oauth2/v1`
 - FHIR R4: `https://api-satusehat.kemkes.go.id/fhir-r4/v1`
-- KFA v2: `https://api-satusehat.kemkes.go.id/kfa-v2`
+- KFA Farmasi v2: `https://api-satusehat.kemkes.go.id/kfa-v2`
+- KFA Alat Kesehatan v3: `https://api-satusehat.kemkes.go.id/kfa-v3`
 
 ## Keamanan
 
