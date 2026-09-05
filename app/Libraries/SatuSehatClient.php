@@ -10,6 +10,7 @@ class SatuSehatClient
     private string $oauthBase;
     private string $fhirBase;
     private string $kfaBase;
+    private string $kfaAlkesBase;
     private string $organizationId;
     private string $clientId;
     private string $clientSecret;
@@ -26,16 +27,19 @@ class SatuSehatClient
                 'oauth' => 'https://api-satusehat.kemkes.go.id/oauth2/v1',
                 'fhir' => 'https://api-satusehat.kemkes.go.id/fhir-r4/v1',
                 'kfa' => 'https://api-satusehat.kemkes.go.id/kfa-v2',
+                'kfa_alkes' => 'https://api-satusehat.kemkes.go.id/kfa-v3',
             ]
             : [
                 'oauth' => 'https://api-satusehat-stg.dto.kemkes.go.id/oauth2/v1',
                 'fhir' => 'https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1',
                 'kfa' => 'https://api-satusehat-stg.dto.kemkes.go.id/kfa-v2',
+                'kfa_alkes' => 'https://api-satusehat-stg.dto.kemkes.go.id/kfa-v3',
             ];
 
         $this->oauthBase = rtrim((string) ($override['oauth_base'] ?? env('satusehat.oauth_base', '')), '/') ?: $official['oauth'];
         $this->fhirBase = rtrim((string) ($override['fhir_base'] ?? env('satusehat.fhir_base', '')), '/') ?: $official['fhir'];
         $this->kfaBase = rtrim((string) ($override['kfa_base'] ?? env('satusehat.kfa_base', '')), '/') ?: $official['kfa'];
+        $this->kfaAlkesBase = rtrim((string) ($override['kfa_alkes_base'] ?? env('satusehat.kfa_alkes_base', '')), '/') ?: $official['kfa_alkes'];
         $this->organizationId = trim((string) ($override['organization_id'] ?? env('satusehat.organization_id', '')));
         $this->clientId = trim((string) ($override['client_id'] ?? env('satusehat.client_id', '')));
         $this->clientSecret = trim((string) ($override['client_secret'] ?? env('satusehat.client_secret', '')));
@@ -50,6 +54,7 @@ class SatuSehatClient
             'oauth_base' => $this->oauthBase,
             'fhir_base' => $this->fhirBase,
             'kfa_base' => $this->kfaBase,
+            'kfa_alkes_base' => $this->kfaAlkesBase,
             'credential_ready' => $this->clientId !== '' && $this->clientSecret !== '',
         ];
     }
@@ -115,10 +120,37 @@ class SatuSehatClient
             throw new RuntimeException('Access Token diperlukan untuk pencarian KFA resmi.');
         }
 
+        $productType = strtolower(trim($productType));
+        if (! in_array($productType, ['farmasi', 'alkes'], true)) {
+            $productType = 'farmasi';
+        }
+
         $headers = [
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json',
         ];
+
+        if ($productType === 'alkes') {
+            $url = $this->kfaAlkesBase . '/alkes/products';
+            $body = [
+                'page' => 1,
+                'size' => max(1, min($size, 100)),
+                'state' => 'valid',
+                'active' => true,
+            ];
+            if (preg_match('/^\d{8}$/', $keyword)) {
+                $body['kfa_code'] = $keyword;
+            } else {
+                $body['search'] = $keyword;
+            }
+
+            $response = $this->http->post($url, [
+                'headers' => $headers + ['Content-Type' => 'application/json'],
+                'json' => $body,
+            ]);
+
+            return $this->normalizeResponse($response->getStatusCode(), $response->getBody(), $response->getHeaders(), $url);
+        }
 
         if (preg_match('/^\d{8}$/', $keyword)) {
             $url = $this->kfaBase . '/products';
@@ -133,18 +165,13 @@ class SatuSehatClient
             return $this->normalizeResponse($response->getStatusCode(), $response->getBody(), $response->getHeaders(), $url);
         }
 
-        $productType = strtolower(trim($productType));
-        if (! in_array($productType, ['farmasi', 'alkes'], true)) {
-            $productType = 'farmasi';
-        }
-
         $url = $this->kfaBase . '/products/all';
         $response = $this->http->get($url, [
             'headers' => $headers,
             'query' => [
                 'page' => 1,
                 'size' => max(1, min($size, 100)),
-                'product_type' => $productType,
+                'product_type' => 'farmasi',
                 'keyword' => $keyword,
             ],
         ]);
