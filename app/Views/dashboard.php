@@ -18,6 +18,7 @@
         </div>
         <div class="nav-label">Workspace</div>
         <button class="nav-item active" data-section="workspace">FHIR Explorer</button>
+        <button class="nav-item" data-section="terminology">Kode Medis</button>
         <button class="nav-item" data-section="connection">Konfigurasi API</button>
         <button class="nav-item" data-section="history">Riwayat Request</button>
         <div class="nav-label">Resource cepat</div>
@@ -29,7 +30,7 @@
         <header class="topbar">
             <div>
                 <h1>SATUSEHAT Simulator</h1>
-                <p>Alat bantu testing FHIR untuk fasilitas kesehatan.</p>
+                <p>FHIR testing dan pencarian terminologi medis untuk fasilitas kesehatan.</p>
             </div>
             <div class="top-actions">
                 <span class="pill <?= $environment === 'production' ? 'danger' : '' ?>" id="envBadge"><?= esc(strtoupper($environment)) ?></span>
@@ -50,7 +51,7 @@
                 </div>
                 <div class="card endpoint-card">
                     <h3>Endpoint aktif</h3>
-                    <dl><dt>OAuth</dt><dd id="oauthUrl"></dd><dt>FHIR R4</dt><dd id="fhirUrl"></dd></dl>
+                    <dl><dt>OAuth</dt><dd id="oauthUrl"></dd><dt>FHIR R4</dt><dd id="fhirUrl"></dd><dt>KFA v2</dt><dd id="kfaUrl"></dd></dl>
                     <button class="btn primary" id="btnToken">Ambil Access Token</button>
                     <label class="mt">Access Token</label>
                     <textarea id="accessToken" rows="6" placeholder="Token akan tampil di sini"></textarea>
@@ -82,6 +83,59 @@
                     <pre id="responseBody">{
   "message": "Klik Send untuk mengirim request ke SATUSEHAT"
 }</pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="section-terminology" hidden>
+            <div class="section-head">
+                <div>
+                    <h2>Kode Medis</h2>
+                    <p>Pencarian ICD-10, SNOMED CT, LOINC, KFA, dan KPTL untuk dipakai langsung pada payload FHIR.</p>
+                </div>
+                <a class="btn" href="https://kodemedis.my.id/" target="_blank" rel="noopener noreferrer">Buka kodemedis.my.id</a>
+            </div>
+
+            <div class="card terminology-search">
+                <div class="terminology-controls">
+                    <div>
+                        <label>Terminologi</label>
+                        <select id="terminologyType">
+                            <option value="icd10">ICD-10 2010</option>
+                            <option value="snomed">SNOMED CT</option>
+                            <option value="loinc">LOINC</option>
+                            <option value="kfa">KFA</option>
+                            <option value="kptl">KPTL</option>
+                        </select>
+                    </div>
+                    <div id="kfaProductWrap" hidden>
+                        <label>Jenis Produk KFA</label>
+                        <select id="kfaProductType"><option value="farmasi">Farmasi / Obat</option><option value="alkes">Alat Kesehatan</option></select>
+                    </div>
+                    <div class="terminology-query">
+                        <label>Kode / istilah</label>
+                        <input id="terminologyQuery" placeholder="Contoh: J40, bronchitis, abdominal pain, EKG, ampicillin">
+                    </div>
+                    <div class="terminology-button"><button class="btn primary" id="btnTerminologySearch">Cari</button></div>
+                </div>
+                <div class="hint" id="terminologyNotice">ICD-10, SNOMED CT, LOINC, dan KPTL membaca dataset lokal. KFA mencari langsung ke API KFA v2 SATUSEHAT dengan access token aktif.</div>
+            </div>
+
+            <div class="grid terminology-grid">
+                <div class="card table-card terminology-table-card">
+                    <table>
+                        <thead><tr><th>Terminologi</th><th>Kode</th><th>Deskripsi</th><th>Aksi</th></tr></thead>
+                        <tbody id="terminologyBody"><tr><td colspan="4" class="empty">Masukkan kode atau istilah lalu klik Cari.</td></tr></tbody>
+                    </table>
+                </div>
+                <div class="card coding-card">
+                    <div class="card-title"><h3>FHIR Coding</h3><span class="status" id="codingStatus">Belum dipilih</span></div>
+                    <textarea class="code-editor coding-preview" id="codingPreview" readonly placeholder="Pilih salah satu hasil pencarian."></textarea>
+                    <div class="coding-actions">
+                        <button class="btn" id="btnCopyCoding" disabled>Salin Coding</button>
+                        <button class="btn primary" id="btnInsertCoding" disabled>Masukkan ke JSON Request</button>
+                    </div>
+                    <div class="hint">Tombol Masukkan ke JSON Request akan mengisi elemen <code>code.coding</code> pada payload aktif. Untuk KFA pada resource obat, coding akan ditempatkan pada <code>medicationCodeableConcept</code> bila memungkinkan.</div>
                 </div>
             </div>
         </section>
