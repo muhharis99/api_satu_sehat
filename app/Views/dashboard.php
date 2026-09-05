@@ -51,7 +51,12 @@
                 </div>
                 <div class="card endpoint-card">
                     <h3>Endpoint aktif</h3>
-                    <dl><dt>OAuth</dt><dd id="oauthUrl"></dd><dt>FHIR R4</dt><dd id="fhirUrl"></dd><dt>KFA v2</dt><dd id="kfaUrl"></dd></dl>
+                    <dl>
+                        <dt>OAuth</dt><dd id="oauthUrl"></dd>
+                        <dt>FHIR R4</dt><dd id="fhirUrl"></dd>
+                        <dt>KFA Farmasi v2</dt><dd id="kfaUrl"></dd>
+                        <dt>KFA Alat Kesehatan v3</dt><dd id="kfaAlkesUrl"></dd>
+                    </dl>
                     <button class="btn primary" id="btnToken">Ambil Access Token</button>
                     <label class="mt">Access Token</label>
                     <textarea id="accessToken" rows="6" placeholder="Token akan tampil di sini"></textarea>
@@ -118,7 +123,7 @@
                     </div>
                     <div class="terminology-button"><button class="btn primary" id="btnTerminologySearch">Cari</button></div>
                 </div>
-                <div class="hint" id="terminologyNotice">ICD-10, SNOMED CT, LOINC, dan KPTL membaca dataset lokal. KFA mencari langsung ke API KFA v2 SATUSEHAT dengan access token aktif.</div>
+                <div class="hint" id="terminologyNotice">ICD-10, SNOMED CT, LOINC, dan KPTL membaca dataset lokal. KFA Farmasi memakai KFA v2 dan Alat Kesehatan memakai KFA v3 SATUSEHAT dengan access token aktif.</div>
             </div>
 
             <div class="grid terminology-grid">
