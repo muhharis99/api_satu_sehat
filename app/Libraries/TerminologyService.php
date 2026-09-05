@@ -198,19 +198,60 @@ class TerminologyService
 
     private function normalizeRow(array $row, string $type): ?array
     {
-        $code = trim((string) ($row['code'] ?? $row['kode'] ?? $row['conceptid'] ?? $row['concept_id'] ?? $row['loincnumber'] ?? $row['loinc_num'] ?? ''));
-        $display = trim((string) ($row['display'] ?? $row['description'] ?? $row['deskripsi'] ?? $row['term'] ?? $row['name'] ?? $row['longcommonname'] ?? $row['long_common_name'] ?? ''));
+        $normalizedKeys = [];
+        foreach ($row as $key => $value) {
+            $normalizedKeys[mb_strtolower(trim((string) $key))] = $value;
+        }
+
+        $code = trim((string) (
+            $row['code']
+            ?? $row['kode']
+            ?? $row['Kode KPTL']
+            ?? $normalizedKeys['kode kptl']
+            ?? $row['conceptid']
+            ?? $row['concept_id']
+            ?? $row['loincnumber']
+            ?? $row['loinc_num']
+            ?? ''
+        ));
+
+        $display = trim((string) (
+            $row['display']
+            ?? $row['Display']
+            ?? $row['description']
+            ?? $row['deskripsi']
+            ?? $row['term']
+            ?? $row['name']
+            ?? $row['Nama Tindakan dan Layanan']
+            ?? $normalizedKeys['nama tindakan dan layanan']
+            ?? $row['longcommonname']
+            ?? $row['long_common_name']
+            ?? ''
+        ));
 
         if ($code === '' || $display === '') {
             return null;
         }
 
+        $system = trim((string) (
+            $row['system']
+            ?? $row['Code System']
+            ?? $normalizedKeys['code system']
+            ?? self::SYSTEMS[$type]['system']
+        ));
+
         return [
             'code' => $code,
             'display' => $display,
-            'system' => (string) ($row['system'] ?? self::SYSTEMS[$type]['system']),
+            'system' => $system !== '' ? $system : self::SYSTEMS[$type]['system'],
             'type' => $type,
             'source' => 'local',
+            'meta' => [
+                'status' => $row['Status'] ?? $normalizedKeys['status'] ?? null,
+                'version' => $row['Version'] ?? $normalizedKeys['version'] ?? null,
+                'base_code' => $row['Base Code'] ?? $normalizedKeys['base code'] ?? null,
+                'allowed_modifiers' => $row['Allowed Modifiers'] ?? $normalizedKeys['allowed modifiers'] ?? null,
+            ],
         ];
     }
 
@@ -218,6 +259,7 @@ class TerminologyService
     {
         $needle = mb_strtolower($query);
         return str_contains(mb_strtolower((string) $row['code']), $needle)
-            || str_contains(mb_strtolower((string) $row['display']), $needle);
+            || str_contains(mb_strtolower((string) $row['display']), $needle)
+            || str_contains(mb_strtolower((string) ($row['meta']['base_code'] ?? '')), $needle);
     }
 }
