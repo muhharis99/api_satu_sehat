@@ -20,6 +20,7 @@ $routes->get('satusehat/history', 'SatuSehat::history');
 $routes->get('playbook', 'Playbook::index');
 $routes->get('playbook/(:segment)', 'Playbook::show/$1');
 $routes->get('playbook/template/(:segment)', 'Playbook::template/$1');
+$routes->post('fhir/validate', 'FhirValidator::validate');
 
 $routes->get('terminology/systems', 'Terminology::systems');
 $routes->post('terminology/search', 'Terminology::search');
