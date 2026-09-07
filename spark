@@ -3,7 +3,22 @@
 
 define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
 chdir(__DIR__);
+
+// CI4's built-in development server defaults to port 8080.
+// Use port 6060 for this project unless the caller explicitly supplies a port.
+$hasPortOption = false;
+foreach ($argv as $arg) {
+    if ($arg === '--port' || str_starts_with($arg, '--port=')) {
+        $hasPortOption = true;
+        break;
+    }
+}
+if (!$hasPortOption && isset($argv[1]) && $argv[1] === 'serve') {
+    $argv[] = '--port';
+    $argv[] = '6060';
+}
+
 require FCPATH . '../app/Config/Paths.php';
-$paths = new Config\Paths();
+$paths = new Config\\Paths();
 require $paths->systemDirectory . '/Boot.php';
-exit(CodeIgniter\Boot::bootSpark($paths));
+exit(CodeIgniter\\Boot::bootSpark($paths));
