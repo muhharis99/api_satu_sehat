@@ -3,7 +3,7 @@
 use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
-$routes->setDefaultNamespace('App\\Controllers');
+$routes->setDefaultNamespace('App\Controllers');
 $routes->setDefaultController('Home');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
@@ -16,6 +16,9 @@ $routes->get('health', 'Home::health');
 $routes->post('satusehat/token', 'SatuSehat::token');
 $routes->post('satusehat/request', 'SatuSehat::request');
 $routes->get('satusehat/history', 'SatuSehat::history');
+
+$routes->get('api/catalog', 'ApiCatalog::index');
+$routes->get('api/catalog/templates', 'ApiCatalog::requestTemplates');
 
 $routes->get('playbook', 'Playbook::index');
 $routes->get('playbook/(:segment)', 'Playbook::show/$1');
