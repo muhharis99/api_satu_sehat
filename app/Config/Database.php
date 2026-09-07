@@ -7,13 +7,10 @@ use CodeIgniter\Database\Config;
 class Database extends Config
 {
     /**
-     * --------------------------------------------------------------------------
-     * Database Connections.
-     * --------------------------------------------------------------------------
+     * Local Laragon / MySQL configuration.
      *
-     * This project does not require a database connection for booting yet.
-     * Keep the default connection available so CodeIgniter services can resolve
-     * the Config\Database class without failing during application startup.
+     * MySQL is exposed by Laragon on port 3307 in the development PC.
+     * Credentials and database name should be supplied through .env when needed.
      */
     public array $default = [
         'DSN'          => '',
@@ -23,7 +20,7 @@ class Database extends Config
         'database'     => '',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
-        'pConnect'     => false,
+        'pConnect'    => false,
         'DBDebug'      => (ENVIRONMENT !== 'production'),
         'charset'      => 'utf8mb4',
         'DBCollat'     => 'utf8mb4_general_ci',
@@ -32,7 +29,7 @@ class Database extends Config
         'compress'     => false,
         'strictOn'     => false,
         'failover'     => [],
-        'port'         => 3306,
+        'port'         => 3307,
         'numberNative' => true,
         'foundRows'    => false,
         'dateFormat'   => [
