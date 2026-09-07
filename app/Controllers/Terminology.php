@@ -14,7 +14,7 @@ class Terminology extends BaseController
             $payload = is_array($payload) ? $payload : [];
             $type = strtolower(trim((string) ($payload['type'] ?? 'icd10')));
             $query = trim((string) ($payload['q'] ?? ''));
-            $limit = (int) ($payload['limit'] ?? 25);
+            $limit = max(1, min((int) ($payload['limit'] ?? 25), 100));
 
             if ($type === 'kfa') {
                 return $this->searchKfa($payload, $query, $limit);
@@ -54,7 +54,6 @@ class Terminology extends BaseController
 
     private function searchKfa(array $payload, string $query, int $limit)
     {
-        $token = trim((string) ($payload['token'] ?? ''));
         $productType = strtolower(trim((string) ($payload['product_type'] ?? 'farmasi')));
         $client = new SatuSehatClient([
             'environment' => $payload['environment'] ?? null,
@@ -62,6 +61,20 @@ class Terminology extends BaseController
             'client_id' => $payload['client_id'] ?? null,
             'client_secret' => $payload['client_secret'] ?? null,
         ]);
+
+        $token = trim((string) ($payload['token'] ?? ''));
+        if ($token === '') {
+            $tokenResult = $client->token();
+            $token = trim((string) ($tokenResult['body']['access_token'] ?? ''));
+            if ($token === '') {
+                return $this->response->setStatusCode((int) ($tokenResult['status'] ?: 401))->setJSON([
+                    'ok' => false,
+                    'status' => $tokenResult['status'] ?? 401,
+                    'message' => 'Access token KFA tidak berhasil dibuat.',
+                    'raw' => $tokenResult['body'] ?? null,
+                ]);
+            }
+        }
 
         $result = $client->searchKfa($query, $token, $productType, $limit);
         $items = [];
@@ -108,8 +121,8 @@ class Terminology extends BaseController
 
     private function normalizeKfa(array $row): ?array
     {
-        $code = trim((string) ($row['kfa_code'] ?? ''));
-        $display = trim((string) ($row['name'] ?? $row['display_name'] ?? ''));
+        $code = trim((string) ($row['kfa_code'] ?? $row['code'] ?? ''));
+        $display = trim((string) ($row['name'] ?? $row['display_name'] ?? $row['display'] ?? ''));
         if ($code === '' || $code === '/' || $display === '') {
             return null;
         }
