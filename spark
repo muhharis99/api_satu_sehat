@@ -19,6 +19,6 @@ if (!$hasPortOption && isset($argv[1]) && $argv[1] === 'serve') {
 }
 
 require FCPATH . '../app/Config/Paths.php';
-$paths = new Config\\Paths();
+$paths = new Config\Paths();
 require $paths->systemDirectory . '/Boot.php';
-exit(CodeIgniter\\Boot::bootSpark($paths));
+exit(CodeIgniter\Boot::bootSpark($paths));
